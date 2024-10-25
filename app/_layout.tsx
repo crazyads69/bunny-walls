@@ -1,5 +1,7 @@
-import { SplashScreen, Stack } from "expo-router";
-// Import your global CSS file
+import React, { useEffect } from "react";
+import { Provider } from "react-redux";
+import store from "@/store/store";
+import { Slot, SplashScreen, Stack } from "expo-router";
 import "../global.css";
 import {
     Montserrat_300Light,
@@ -7,7 +9,6 @@ import {
     Montserrat_500Medium,
     Montserrat_600SemiBold,
     Montserrat_700Bold,
-    useFonts,
 } from "@expo-google-fonts/montserrat";
 import {
     Poppins_300Light,
@@ -23,9 +24,8 @@ import {
     SpaceGrotesk_600SemiBold,
     SpaceGrotesk_700Bold,
 } from "@expo-google-fonts/space-grotesk";
-import { useEffect } from "react";
+import { useFonts } from "expo-font";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -56,10 +56,13 @@ export default function RootLayout() {
     if (!loaded) {
         return null;
     }
-
     return (
-        <Stack>
-            <Stack.Screen name="index" />
-        </Stack>
+        <Provider store={store}>
+            <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            </Stack>
+        </Provider>
     );
 }

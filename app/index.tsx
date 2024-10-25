@@ -1,15 +1,83 @@
-import { Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { auth } from "../util/firebaseConfig";
+import { logoutSuccess, setUser, setLoading } from "../store/slice/authSlice";
+import { RootState } from "@/store/store";
+import { convertFirebaseUserToUser } from "@/util/auth/authUtil";
+import { Slot, useRouter, useSegments, Href, Redirect } from "expo-router";
+import LoadingScreen from "./(utils)/loading";
+
+// Define types for routes and segments
+type RouteSegment = "(auth)" | "(tabs)" | "wallpaper" | string;
+type AppRoute =
+    | "/(auth)"
+    | "/(auth)/login"
+    | "/(auth)/register"
+    | "/(tabs)"
+    | "/(tabs)/favorite"
+    | "/(tabs)/leaderboard"
+    | "/(tabs)/profile"
+    | "/(tabs)/upload"
+    | "/wallpaper/[id]"
+    | "/";
 
 export default function Index() {
-    return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-        >
-            <Text>Edit app/index.tsx to edit this screen.</Text>
-        </View>
-    );
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const segments = useSegments();
+    const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    useEffect(() => {
+        dispatch(setLoading(true));
+        const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+            if (firebaseUser) {
+                const user = convertFirebaseUserToUser(firebaseUser);
+                dispatch(setUser(user));
+            } else {
+                dispatch(logoutSuccess());
+            }
+            setIsInitialized(true);
+            dispatch(setLoading(false));
+        });
+        return unsubscribe;
+    }, [dispatch]);
+
+    const navigateTo = (route: AppRoute) => {
+        router.replace(route as Href<string>);
+    };
+
+    useEffect(() => {
+        if (!isInitialized) return;
+
+        const currentSegment = segments[0] as RouteSegment;
+        const inAuthGroup = currentSegment === "(auth)";
+        const inWallpaperRoute = currentSegment === "wallpaper";
+
+        if (!isAuthenticated) {
+            // If not authenticated, redirect to auth index page
+            if (!inAuthGroup) {
+                navigateTo("/(auth)");
+            }
+        } else {
+            // If authenticated
+            if (inAuthGroup) {
+                // Redirect to tabs if trying to access auth pages while authenticated
+                navigateTo("/(tabs)");
+            } else if (inWallpaperRoute) {
+                // Allow access to wallpaper route
+                // The route is already correct, so we don't need to do anything
+            } else if (currentSegment !== "(tabs)") {
+                // If not in tabs or wallpaper route, redirect to tabs
+                navigateTo("/(tabs)");
+            }
+        }
+    }, [isAuthenticated, segments, isInitialized, router]);
+
+    if (isLoading || !isInitialized) {
+        return <LoadingScreen />;
+    }
+
+    return <Redirect href="/(auth)" />;
 }
