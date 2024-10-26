@@ -61,7 +61,7 @@ export default function WelcomeScreen() {
                         duration={1000}
                         className="font-pops text-lg text-neutral-700"
                     >
-                        Stay in the NewJeans loop!
+                        ❀ Stay in the NewJeans loop! ❀
                     </Animatable.Text>
                 </View>
 

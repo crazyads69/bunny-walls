@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../util/firebaseConfig";
-import { logoutSuccess, setUser, setLoading } from "../store/slice/authSlice";
 import { RootState } from "@/store/store";
 import { convertFirebaseUserToUser } from "@/util/auth/authUtil";
-import { Slot, useRouter, useSegments, Href, Redirect } from "expo-router";
+import { Href, useRouter, useSegments } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutSuccess, setLoading, setUser } from "../store/slice/authSlice";
+import { auth } from "../util/firebaseConfig";
 import LoadingScreen from "./(utils)/loading";
 
 // Define types for routes and segments
@@ -31,6 +31,9 @@ export default function Index() {
 
     useEffect(() => {
         dispatch(setLoading(true));
+        const minLoadingTime = 5000; // 1 second minimum loading time
+        const startTime = Date.now();
+
         const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
             if (firebaseUser) {
                 const user = convertFirebaseUserToUser(firebaseUser);
@@ -38,9 +41,16 @@ export default function Index() {
             } else {
                 dispatch(logoutSuccess());
             }
-            setIsInitialized(true);
-            dispatch(setLoading(false));
+
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+            setTimeout(() => {
+                setIsInitialized(true);
+                dispatch(setLoading(false));
+            }, remainingTime);
         });
+
         return unsubscribe;
     }, [dispatch]);
 
@@ -79,5 +89,5 @@ export default function Index() {
         return <LoadingScreen />;
     }
 
-    return <Redirect href="/(auth)" />;
+    return null;
 }
