@@ -2,7 +2,7 @@ import { User as FirebaseUser } from "firebase/auth";
 import User from "../../model/authModel";
 
 // Function to convert Firebase User to our User model
-function convertFirebaseUserToUser(firebaseUser: FirebaseUser): User {
+export function convertFirebaseUserToUser(firebaseUser: FirebaseUser): User {
     return {
         uid: firebaseUser.uid,
         email: firebaseUser.email,

@@ -1,8 +1,26 @@
 export const typography = {
     fonts: {
-        primary: "Montserrat", // Modern, clean font
-        secondary: "Poppins", // Friendly, rounded font
-        accent: "Space Grotesk", // Y2K-inspired font
+        primary: {
+            light: "MontserratLight",
+            regular: "MontserratRegular",
+            medium: "MontserratMedium",
+            semibold: "MontserratSemiBold",
+            bold: "MontserratBold",
+        },
+        secondary: {
+            light: "PoppinsLight",
+            regular: "PoppinsRegular",
+            medium: "PoppinsMedium",
+            semibold: "PoppinsSemiBold",
+            bold: "PoppinsBold",
+        },
+        accent: {
+            light: "SpaceGroteskLight",
+            regular: "SpaceGroteskRegular",
+            medium: "SpaceGroteskMedium",
+            semibold: "SpaceGroteskSemiBold",
+            bold: "SpaceGroteskBold",
+        },
     },
 
     sizes: {

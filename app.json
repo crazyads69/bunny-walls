@@ -34,7 +34,7 @@
             "expo-splash-screen",
             "expo-system-ui",
             "expo-font",
-            "expo-linking"
+            "expo-asset"
         ],
         "experiments": {
             "typedRoutes": true
